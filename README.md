@@ -64,55 +64,29 @@
 
 ## 2. 데이터 분석 — KOSIS 4종 데이터 통합 분석
 
-> **목표**: B2B 글로벌 판로 플랫폼이 1차 영입할 **품목·국가·기업군·산업**을 정량 근거로 도출
+> **목표**: 기획 배경의 두 양극화(기업 규모·시장 분포)를 **정량 근거로 검증**하고, 플랫폼이 1차로 묶어야 할 셀과 영입 풀을 식별
 
 ### 분석 축
 
-| 축 | 데이터 | 도출 결과 |
+| 축 | 데이터 | 기획 배경 매핑 |
 |---|---|---|
-| 품목 | 품목별 수출·수입액 (2026.01–03) | 무역수지·모멘텀 상위 카테고리 |
-| 국가 | 국가별 수출입 (2022.01–2026.03) | 누적 수출 상위 10개국 |
-| 기업규모 × 수출강도 | 2023년 단면 | 1사평균 교역액 격차 시각화 |
-| 산업 | 산업별 활동/신생 (2024) | 영입 풀이 두꺼운 산업 |
+| 국가 | 국가별 수출입 (2022.01–2026.03) | 시장 분포 편중 검증 |
+| 기업규모 × 수출강도 | 2023년 단면 + 2015–2023 시계열 | 기업 규모 양극화 + 1사평균 격차 |
+| 산업 | 산업별 활동/신생 (2024) | 다대다 매칭 영입 풀 |
 
-### 핵심 코드 1 — 품목별 우선순위 (무역수지 × 모멘텀 × 규모)
+---
 
-```python
-exp_df = ts_df[ts_df['구분'] == '수출']
-imp_df = ts_df[ts_df['구분'] == '수입']
+### 검증 1. 시장 편중 — 누적 수출 상위 10개국
 
-exp_sum = exp_df.groupby('품목')['금액'].sum()
-imp_sum = imp_df.groupby('품목')['금액'].sum()
-trade_balance = exp_sum - imp_sum
-
-exp_jan = exp_df[exp_df['date'] == '2026-01-01'].set_index('품목')['금액']
-exp_mar = exp_df[exp_df['date'] == '2026-03-01'].set_index('품목')['금액']
-momentum = exp_mar - exp_jan
-
-priority_df = pd.DataFrame({
-    '수출규모': exp_sum,
-    '무역수지': trade_balance,
-    '모멘텀': momentum,
-}).sort_values(['무역수지', '수출규모'], ascending=False)
-```
-
-**무역수지 상위 10 품목 (2026.01–03 누적)**
-
-![무역수지 상위 10 품목](./AI_발표_images/kosis_01.png)
-
-**무역수지 상위 5 품목 — 월별 수출액 추이**
-
-![월별 수출액 추이](./AI_발표_images/kosis_02.png)
-
-**수출규모 × 모멘텀 — 우상향 = 1차 타겟 카테고리**
-
-![수출규모 × 모멘텀 산점도](./AI_발표_images/kosis_03.png)
-
-**누적 수출 상위 10개국 (2022.01–2026.03)**
+상위 10개국에 누적 수출이 집중되어 있음을 시각화. **기획 배경의 "상위 10개국 71.1%, 중·미 36.2%" 주장에 대한 정량 근거**.
 
 ![누적 수출 상위 10개국](./AI_발표_images/kosis_04.png)
 
-### 핵심 코드 2 — 기업규모 × 수출강도 1사평균 (격차의 정량화)
+→ 중국·미국 두 나라가 압도적이며, 그 외 102개 신흥 시장의 기회 공간이 가시화됨.
+
+---
+
+### 검증 2. 기업 규모 양극화 — 1사평균 교역액 격차
 
 ```python
 size_2023_df = size_long_df[
@@ -123,17 +97,19 @@ size_2023_df = size_long_df[
 ].sort_values("1사평균_천달러", ascending=False)
 ```
 
-**기업규모 × 수출강도별 1사평균 교역액 (2023, 천달러)**
-
 ![기업규모 × 수출강도 1사평균 교역액](./AI_발표_images/kosis_05.png)
 
-→ 1사평균 최상위는 대기업 50–74% 구간(약 18.3억 천달러), 최하위는 중소기업 1–24% 구간(약 307 천달러). 모수는 중소기업 1–24%(56,578개)가 압도적이며 **1사평균 격차는 약 5,964배**. **플랫폼이 묶어줘야 할 가치가 가장 큰 셀.**
+→ 1사평균 최상위는 **대기업 50–74% 구간(약 18.3억 천달러)**, 최하위는 **중소기업 1–24% 구간(약 307 천달러)**. 모수는 중소기업 1–24%(56,578개)가 압도적이며 **1사평균 격차는 약 5,964배**. **플랫폼이 묶어줘야 할 가치가 가장 큰 셀.**
 
-**수출강도 75% 이상 셀의 1사평균 추이 (2015–2023)** — hue=기업규모로 격차 구조 확인
+**격차의 추세 — 수출강도 75% 이상 셀의 1사평균 추이 (2015–2023)**
 
 ![수출강도 75% 이상 1사평균 추이](./AI_발표_images/kosis_08.png)
 
-### 핵심 코드 3 — 종합 산점도 (hue로 영입 풀 식별)
+→ 같은 "수출 본업 구간"에 있어도 중소기업과 대기업·중견기업의 1사평균 격차가 **시간이 지나도 좁혀지지 않음**. 시장의 자발적 해소가 일어나지 않는다는 증거 → **매개 인프라가 필요한 이유**.
+
+---
+
+### 검증 3. 다대다 매칭 영입 풀 — 산업별 활동 × 신생률
 
 ```python
 plt.figure(figsize=(12, 7))
@@ -144,25 +120,19 @@ sns.scatterplot(
 )
 plt.axhline(industry_hue_df["신생률"].median(), color="gray", linestyle="--")
 plt.axvline(industry_hue_df["활동"].median(), color="gray", linestyle="--")
-plt.title("산업별 활동 기업수 × 신생률 (2024) — 우상단 = 1차 영입 풀")
 ```
-
-**활동 기업수 상위 10개 산업 (2024)**
-
-![활동 기업수 상위 10개 산업](./AI_발표_images/kosis_06.png)
-
-**산업별 활동 기업수 × 신생률 (2024) — hue=산업, size=신생**
 
 ![산업별 활동 × 신생률 산점도](./AI_발표_images/kosis_07.png)
 
-→ 우상단(median 활동 × median 신생률 동시 통과) 산업이 **1차 영입 풀로 가장 두꺼움**. 도매·소매, 숙박·음식점, 전문과학기술서비스 등이 후보.
+→ 우상단(median 활동 × median 신생률 동시 통과) 산업이 **1차 영입 풀로 가장 두꺼움**. 활동 기업수가 많아 영입 모수가 크고, 신생률이 높아 신규 가입자 유입 가능성도 동시에 큼.
 
-### 분석 결론
+---
 
-1. **국가** — 상위 10개국이 수출의 대부분. 1차 영입 품목의 판로는 이 시장으로 우선 연결.
-2. **기업규모 × 수출강도** — 1사평균 격차가 가장 큰 셀(중소·1–24%)이 플랫폼 가치 제안의 핵심 타깃.
-3. **산업** — 활동·신생률 동시 상위인 우상단 산업이 영입 풀로 가장 두꺼움.
-4. **품목** — 무역수지 상위 품목 중 위 3개 조건과 매핑되는 품목이 1차 영입 카테고리 최종 후보.
+### 분석 결론 → 기획 의도와의 연결
+
+1. **시장 편중 검증됨** → 마켓 레이어가 102개 신흥국 판로를 열어야 함
+2. **기업 규모 격차 검증됨** → 플랫폼은 **중소기업 1–24% 셀**을 묶어 1사평균 격차를 줄이는 가치 제공
+3. **영입 풀 식별** → 우상단 산업(도매·소매, 숙박·음식점, 전문과학기술서비스 등)부터 소셜 그래프 레이어를 채움
 
 ---
 
@@ -295,9 +265,9 @@ def moderation_action(p_abusive):
 
 → 결제 금액과 노출 시간 사이에 강한 비선형 양의 상관(로그변환이 필요한 형태).
 
-### 리팩토링 (Codex Review 반영) — 핵심 변경점
+### 설계 원칙 — 핵심 포인트
 
-| Priority | 변경 |
+| Priority | 포인트 |
 |---|---|
 | P1 | split **먼저** → 전처리는 Pipeline 안에서 train에만 fit (data leakage 차단) |
 | P1 | 타겟 기반 IQR 필터링 제거 (production-valid 평가) |
@@ -457,31 +427,97 @@ def recommend_similar_communities(community_id, top_n=5, method='tfidf'):
 > **스택**: LangChain + FAISS + `jhgan/ko-sbert-nli` + Redis Semantic Cache + GPT
 > **권한 모델**: `member_id`가 caller/receiver인 회의 요약만 검색·캐시
 
-### 아키텍처
+### 전체 흐름 (8단계)
 
 ```
-사용자 질문
+[1] 문서 로드 (DB → Document)
     ↓
-[1] 권한 검증 (DB)
+[2] 시맨틱 캐시 설정 (질문 단위 답변 캐시)
     ↓
-[2] Redis Semantic Cache 조회 (scope = member_X__video_session_Y)
-    ↓ (miss)
-[3] FAISS 벡터 검색 (video_session_id metadata filter)
+[3] 문서 분할 (RecursiveCharacterTextSplitter)
     ↓
-[4] PromptTemplate + GPT 호출
+[4] 임베딩 (jhgan/ko-sbert-nli)
     ↓
-[5] 결과 캐싱 후 반환
+[5] 벡터 DB 구축 (FAISS)
+    ↓
+[6] 검색기 (video_session_id metadata filter)
+    ↓
+[7] 프롬프트 (Context 밖 정보 금지)
+    ↓
+[8] LLM + LCEL 체인 (비동기 호환)
 ```
 
-### 핵심 코드 1 — Semantic Cache (질문 단위, scope 분리)
+---
 
-**왜 LangChain 전역 `RedisSemanticCache`를 끄는가?**
-RAG 최종 프롬프트에는 긴 공통 Context가 들어가서 **다른 질문도 같은 답변으로 캐시 히트**할 위험이 있다. 그래서 `member_id + video_session_id + question`을 임베딩한 답변 캐시를 RAG 앞단에 둔다.
+### Step 1 — 문서 로드 (DB → Document)
+
+운영 흐름과 동일하게, **현재 `member_id`가 caller 또는 receiver인 회의의 요약만** DB에서 가져온다. 권한 없는 회의가 벡터 DB에 적재되는 것 자체를 막는 1차 방어선.
 
 ```python
+def load_video_summaries_for_member(member_id, video_session_id=None):
+    query = text("""
+        select s.id as summary_id, s.video_session_id, vs.conversation_id,
+               vs.caller_id, vs.receiver_id, s.created_datetime, s.summary
+        from tbl_ai_video_summary s
+        join tbl_video_session vs on vs.id = s.video_session_id
+        where (vs.caller_id = :member_id or vs.receiver_id = :member_id)
+          and (:video_session_id is null or s.video_session_id = cast(:video_session_id as bigint))
+        order by s.video_session_id
+    """)
+    return pd.read_sql(query, engine, params={"member_id": int(member_id), ...})
+```
+
+조회한 row마다 `.txt` 파일로 저장하고 `TextLoader`로 다시 읽어 `Document` 객체로 변환. **summary는 본문**, 나머지 컬럼은 **metadata**(추적·필터링용)로 부착.
+
+```python
+for row in summary_df.itertuples(index=False):
+    txt_path = summaries_dir / f"session_{int(row.video_session_id)}.txt"
+    txt_path.write_text(row.summary, encoding="utf-8")
+    metadata_by_file[str(txt_path)] = {
+        "summary_id": int(row.summary_id),
+        "video_session_id": int(row.video_session_id),
+        "conversation_id": int(row.conversation_id),
+        "caller_id": int(row.caller_id),
+        "receiver_id": int(row.receiver_id),
+    }
+
+for txt_file in expected_files:
+    loaded_docs = TextLoader(str(txt_file), encoding="utf-8").load()
+    for doc in loaded_docs:
+        doc.metadata.update(metadata_by_file[str(txt_file)])
+    docs.extend(loaded_docs)
+```
+
+---
+
+### Step 2 — 시맨틱 캐시 설정 (질문 단위)
+
+**왜 LangChain 전역 `RedisSemanticCache`를 끄는가?**
+RAG 최종 프롬프트에는 긴 공통 Context가 들어가서 **다른 질문도 같은 답변으로 캐시 히트**할 위험이 있다. 그래서 LangChain 전역 LLM 캐시는 끄고, `member_id + video_session_id + question`을 임베딩한 **답변 캐시**를 RAG 앞단에 둔다.
+
+```python
+set_llm_cache(None)  # 전역 LLM 캐시 끔
+
+cache_embeddings = HuggingFaceEmbeddings(
+    model_name="jhgan/ko-sbert-nli",
+    encode_kwargs={'normalize_embeddings': True}
+)
+
+REDIS_URL = "redis://localhost:6380"
+ANSWER_CACHE_INDEX = "video_chat_rag_answer_cache"
+ANSWER_CACHE_SCORE_THRESHOLD = 0.1
+```
+
+scope를 만들어 사용자/회의별로 캐시를 분리하고, 질문 앞에 scope를 prepend하여 임베딩.
+
+```python
+def build_cache_scope(video_session_id=None, member_id=None):
+    member_scope = str(require_member_id(member_id))
+    session_scope = "all" if video_session_id is None else str(int(video_session_id))
+    return f"member_{member_scope}__video_session_{session_scope}"
+
 def build_cache_query(question, video_session_id=None, member_id=None):
     scope = build_cache_scope(video_session_id, member_id)
-    # scope를 질문 앞에 붙여서 같은 질문이라도 다른 사용자/회의면 다른 벡터로 임베딩
     return f"{scope}\n질문: {question}"
 
 def lookup_answer_cache(question, video_session_id=None, member_id=None):
@@ -491,25 +527,112 @@ def lookup_answer_cache(question, video_session_id=None, member_id=None):
     # scope tag로 먼저 제한 → 다른 사용자/회의 캐시 혼입 방지
     scope_filter = RedisTag("scope") == expected_scope
     results = vector_db.similarity_search_with_score(cache_query, k=1, filter=scope_filter)
-    # ...
-    if score <= ANSWER_CACHE_SCORE_THRESHOLD and cached_scope == expected_scope:
-        return {"answer": ..., "score": score, ...}
+
+    if results and results[0][1] <= ANSWER_CACHE_SCORE_THRESHOLD:
+        doc, score = results[0]
+        return {"answer": doc.metadata["answer"], "score": score, "scope": expected_scope}
+    return None
 ```
 
-### 핵심 코드 2 — video_session_id metadata filter로 검색 범위 제한
+---
+
+### Step 3 — 문서 분할 (Chunking)
+
+회의 1건 요약이 500자보다 짧으면 **회의 1건 = 청크 1개**가 정상. `chunk_overlap=50`으로 문장 경계에서 잘려도 앞뒤 문맥이 일부 유지되도록 함.
 
 ```python
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+split_documents = text_splitter.split_documents(docs)
+print(f"분할된 청크의 수: {len(split_documents)}")
+```
+
+---
+
+### Step 4 — 임베딩 (RAG 검색용)
+
+한국어 의미 유사도가 검증된 **`jhgan/ko-sbert-nli`** 모델을 로컬 CPU에서 실행. `normalize_embeddings=True`로 벡터 크기를 정규화해 유사도 비교를 안정화.
+
+```python
+from langchain_huggingface import HuggingFaceEmbeddings
+
+embeddings = HuggingFaceEmbeddings(
+    model_name="jhgan/ko-sbert-nli",
+    model_kwargs={'device': 'cpu'},
+    encode_kwargs={'normalize_embeddings': True}
+)
+```
+
+> 답변 캐시(Step 2)와 **같은 임베딩 모델**을 쓰는 게 핵심. 캐시 매칭 기준과 RAG 검색 기준이 다르면 캐시 히트율이 망가짐.
+
+---
+
+### Step 5 — 벡터 DB (FAISS)
+
+분할된 청크들을 임베딩해서 로컬 FAISS 인덱스에 적재. 운영에서는 회의 요약이 갱신될 때마다 이 단계를 재실행.
+
+```python
+from langchain_community.vectorstores import FAISS
+
+vectorstore = FAISS.from_documents(documents=split_documents, embedding=embeddings)
+```
+
+---
+
+### Step 6 — 검색기 (Retriever + Metadata Filter)
+
+`video_session_id`가 들어오면 **해당 회의 청크만** 검색하도록 metadata filter 적용. → 사용자가 특정 회의를 콕 집어 물어볼 때 다른 회의 내용이 섞이는 것을 차단.
+
+```python
+retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
+
 def retrieve_documents(question, video_session_id=None, k=4):
     search_kwargs = {"k": k}
     if video_session_id is not None:
-        # 특정 회의만 물어볼 때는 해당 회의 청크만 검색
+        # 특정 회의만 물어볼 때는 해당 video_session_id metadata를 가진 청크만 검색
         search_kwargs["filter"] = {"video_session_id": int(video_session_id)}
     return vectorstore.similarity_search(question, **search_kwargs)
+
+def format_documents(documents):
+    return "\n\n".join(doc.page_content for doc in documents)
 ```
 
-### 핵심 코드 3 — LCEL 비동기 체인 (FastAPI 재사용)
+---
+
+### Step 7 — 프롬프트 (Context 밖 정보 금지)
+
+핵심은 **Context 안의 정보만** 사용하게 제한하고, 모르면 모른다고 답하게 만드는 것. 환각(hallucination)을 시스템 레벨에서 차단.
 
 ```python
+from langchain_core.prompts import PromptTemplate
+
+prompt = PromptTemplate.from_template(
+    """귀하는 제공된 참고 문헌을 바탕으로 질문에 답하는 정보 분석 전문가입니다.
+    답변 시 반드시 제시된 문맥(Context) 내의 정보만을 활용하십시오.
+    만약 주어진 자료만으로 답변이 어렵다면, 추측하지 말고
+    '제공된 정보로는 확인이 불가능하다'고 명확히 밝히십시오.
+    모든 응답은 한국어로 작성합니다.
+
+    #Context: {context}
+    #Question: {question}
+    #Answer:"""
+)
+```
+
+---
+
+### Step 8 — LLM + LCEL 체인 (비동기 호환)
+
+LCEL(LangChain Expression Language) 체인은 `invoke` / `ainvoke` **둘 다 지원**. 정의는 동일하고 호출 시점에서만 비동기 여부 결정 → FastAPI 엔드포인트에서 `await chain.ainvoke(...)` 그대로 재사용.
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda
+
+llm = ChatOpenAI(model_name="gpt-5.4-mini", temperature=0, cache=False)
+
 chain = (
     {"context":  RunnableLambda(_context_from_input),
      "question": RunnableLambda(_question_from_input)}
@@ -517,34 +640,30 @@ chain = (
     | llm
     | StrOutputParser()
 )
+```
 
+최종 진입점에서 Step 1~8을 묶음. **권한 검증 → 캐시 조회 → RAG 호출 → 캐시 저장** 순서.
+
+```python
 async def ask_video_chat_rag(question, video_session_id=None, member_id=None):
     member_id = require_member_id(member_id)
-    assert_video_session_access(member_id, video_session_id)   # 1) 권한 검증
+    assert_video_session_access(member_id, video_session_id)         # 권한 검증
 
     cached = lookup_answer_cache(question, video_session_id, member_id)
     if cached:
-        return {"answer": cached["answer"], "cache_hit": True, ...}
+        return {"answer": cached["answer"], "cache_hit": True,
+                "cache_score": cached["score"], "source": "semantic_cache"}
 
-    answer = await chain.ainvoke(payload)                       # 2) RAG 호출
+    payload = {"question": question}
+    if video_session_id is not None:
+        payload["video_session_id"] = int(video_session_id)
+
+    answer = await chain.ainvoke(payload)                            # RAG 호출
     store_answer_cache(question, answer, video_session_id, member_id)
-    return {"answer": answer, "cache_hit": False, ...}
+    return {"answer": answer, "cache_hit": False, "source": "llm_rag"}
 ```
 
-### 핵심 코드 4 — Prompt (Context 밖 정보 금지)
-
-```python
-prompt = PromptTemplate.from_template(
-    """귀하는 제공된 참고 문헌을 바탕으로 질문에 답하는 정보 분석 전문가입니다.
-    답변 시 반드시 제시된 문맥(Context) 내의 정보만을 활용하십시오.
-    만약 주어진 자료만으로 답변이 어렵다면, 추측하지 말고
-    '제공된 정보로는 확인이 불가능하다'고 명확히 밝히십시오.
-
-    #Context: {context}
-    #Question: {question}
-    #Answer:"""
-)
-```
+---
 
 ### 검증 결과
 
@@ -562,132 +681,23 @@ prompt = PromptTemplate.from_template(
 
 ## 7. LLM (n8n) — 주간 개인화 리포트 자동 발송
 
-> **목표**: 매주 월요일 09:00, 지난 7일간 좋아요한 활동이 있는 회원에게 **개인 맞춤 큐레이션 이메일** 자동 발송
-> **스택**: n8n + PostgreSQL + OpenAI (GPT-5.4-nano) + Gmail
+> **목표**: 매주 월요일 09:00, 지난 7일간 활동한 회원에게 **개인 맞춤 큐레이션 메일** 자동 발송
+> **스택**: n8n + PostgreSQL + OpenAI + Gmail
 
-### 워크플로우 다이어그램
-
-```
-[Schedule Trigger (Mon 09:00)]  or  [Webhook (수동 트리거)]
-                  ↓
-        [Get site context]            ← 전체 인기 글/해시태그 (executeOnce)
-                  ↓
-        [Get target members]          ← 지난 7일 좋아요 활동 회원 조회
-                  ↓
-   ┌──────[Loop Over Members]──────┐
-   ↓                                ↑
-[Get user data]                     │
-   ↓                                │
-[Build prompt input]                │
-   ↓                                │
-[Generate personal report] (OpenAI) │
-   ↓                                │
-[Format email] (HTML escape)        │
-   ↓                                │
-[Skip 체크]                          │
-   ↓                                │
-[Rate limit 1s] → [Send Gmail] ─────┘
-```
-
-### 핵심 1 — 사용자별 개인화 데이터를 한 쿼리로
-
-5개 데이터(좋아요 글 / Top 해시태그 / 추천 글 / 추천 팔로우 / 추천 커뮤니티)를 **JSON 컬럼 5개로 묶어 1번의 round-trip**으로 가져옴.
-
-```sql
-with
-liked_posts_raw as (
-  select p.id, p.title, p.content, p.created_datetime, pl.created_datetime as liked_at
-  from tbl_post_like pl
-  join tbl_post p on p.id = pl.post_id
-  where pl.member_id = $1 and pl.created_datetime >= now() - interval '7 days'
-  order by pl.created_datetime desc limit 30
-),
-user_hashtags_raw as ( /* 지난 30일 Top 5 해시태그 */ ),
-rec_posts_raw as ( /* 안 본 인기 글 Top 5 */ ),
-rec_follows_raw as ( /* 자주 반응했지만 안 팔로우한 작성자 Top 3 */ ),
-rec_communities_raw as ( /* 관심사 카테고리의 미가입 커뮤니티 Top 3 */ )
-select
-  coalesce((select json_agg(row_to_json(t)) from liked_posts_raw t),   '[]'::json) as liked_posts,
-  coalesce((select json_agg(row_to_json(t)) from user_hashtags_raw t), '[]'::json) as user_hashtags,
-  coalesce((select json_agg(row_to_json(t)) from rec_posts_raw t),     '[]'::json) as rec_posts,
-  coalesce((select json_agg(row_to_json(t)) from rec_follows_raw t),   '[]'::json) as rec_follows,
-  coalesce((select json_agg(row_to_json(t)) from rec_communities_raw t),'[]'::json) as rec_communities;
-```
-
-### 핵심 2 — Build prompt input (실패 회원은 _skip 마커)
-
-```javascript
-const member = $('Loop Over Members').item.json;
-const u      = $input.first().json;
-const site   = $('Get site context').item.json;
-
-// Get user data가 실패한 경우 (continueOnFail 통과 데이터)
-if (u.error || (!u.liked_posts && !u.user_hashtags)) {
-  return [{ json: { ..., _skip: true, _reason: 'get_user_data_failed' } }];
-}
-
-// 토큰 절약: 좋아요 글 본문 600자 컷
-let likedText = likedPosts.map((row, i) => {
-  const content = (row.content || '').toString().slice(0, 600);
-  return `[${i + 1}] 제목: ${row.title}\n내용: ${content}`;
-}).join('\n---\n').replaceAll('#', '').replaceAll('*', '');
-```
-
-### 핵심 3 — 큐레이션 프롬프트 (개인화 강제)
+### 워크플로우
 
 ```
-너는 GlobalGates 커뮤니티의 전속 큐레이터다. 단 한 사람,
-{{ $json.nickname }}님 한 분만을 위한 주간 큐레이션 메일을 작성한다.
-받는 사람이 "이건 다른 누구도 아닌 내 메일이다"라고 느끼게 만드는 것이 목표다.
-
-[입력 데이터]
-A) 지난 7일 좋아요한 글 ...
-B) Top 해시태그 (지난 30일) ...
-C) 사이트 전체 인기 해시태그 ...
-D) 사이트 전체 인기 글 ...
-E) 추천 후보 (글/팔로우/커뮤니티) ...
-
-[작성 가이드 — 4 섹션]
-▶ 이번 주 {{ nickname }}님은 (3~4문장, 키워드 1~2개 인용)
-▶ 이번 주 커뮤니티에서 일어난 일 (불릿 3개, 숫자 인용 필수)
-▶ {{ nickname }}님께 어울릴 것 같아요 (불릿 3개, 이유 명시)
-▶ 한 줄 응원 (관심사 결을 살린 마무리)
-
-[엄격 규칙]
-1) 입력 데이터에 없는 사실/숫자/인물/제목을 절대 지어내지 마라
-2) 광고·매수매도·투자 조언 금지
-3) 마크다운(#, *, `) 금지
-4) 1,500~2,000자 / "{{ nickname }}님"을 4번 이상 호명
+Schedule Trigger (Mon 09:00)
+    → Get site context (전체 인기 글/해시태그, 1회 실행)
+    → Get target members (지난 7일 활동 회원)
+    → Loop: Get user data → Build prompt → OpenAI → Format → Send Gmail
 ```
 
-### 핵심 4 — Format email (XSS 방지 HTML 이스케이프)
+### 핵심 포인트
 
-```javascript
-const escapeHtml = (s) => String(s)
-  .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
-  .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
-
-const safeNickname = escapeHtml(member.nickname);
-const safeText     = escapeHtml(text);
-
-const html = `
-<div style="font-family:Apple SD Gothic Neo,...;max-width:640px">
-  <h2 style="color:#7c5cff">${safeNickname}님의 주간 리포트</h2>
-  <p style="color:#666;font-size:13px">지난 7일 좋아요 ${member.post_count}건 기반 · 개인 맞춤 분석</p>
-  <pre style="white-space:pre-wrap;...">${safeText}</pre>
-</div>`;
-```
-
-### 운영 안정성 장치
-
-| 노드 | 역할 |
-|---|---|
-| `Get site context` | `executeOnce: true` — 회원 수만큼 반복 안 함 |
-| `Get user data` | `continueOnFail: true` — 한 회원 실패해도 전체 중단 안 함 |
-| `Build prompt input` | `_skip` 마커로 실패 회원 격리 |
-| `Skip 체크` (IF 노드) | `_skip=true`면 메일 발송 건너뛰고 다음 회원으로 |
-| `Rate limit (1s)` | Gmail API 분당 한도 회피 |
-| `Webhook` | 즉시 응답(202) 반환 + 비동기 처리 |
+- **사용자별 5종 데이터를 1쿼리로 묶음** (좋아요 글 / Top 해시태그 / 추천 글 / 추천 팔로우 / 추천 커뮤니티) → DB round-trip 최소화
+- **운영 안정성**: `continueOnFail`로 일부 회원 실패해도 워크플로우 유지, `_skip` 마커로 실패 격리, Gmail rate limit 대응
+- **개인화 강제 프롬프트**: 입력 데이터에 없는 사실 금지, 닉네임 4회 이상 호명, 마크다운 금지로 평문 메일
 
 ---
 
