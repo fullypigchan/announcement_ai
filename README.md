@@ -1,27 +1,27 @@
 # GlobalGates — AI 발표 자료
 
 > **"피드로 여는 기업용 비즈니스 소셜 마켓"**
-> 한국 수출 구조의 다대다 미스매치를 해소하는 B2B 글로벌 판로 플랫폼
+> 한국 수출 구조의 다대다 미스매치(많은 중소기업과 많은 신흥 시장이 서로 만나지 못하는 어긋남)를 해소하는 B2B 글로벌 판로 플랫폼
 
 ---
 
 ## 목차
 
 1. [기획 배경 & 의도](#1-기획-배경--의도)
-2. [데이터 분석 — KOSIS 4종 데이터 통합 분석](#2-데이터-분석--kosis-4종-데이터-통합-분석)
+2. [데이터 분석 — KOSIS 데이터로 양극화 검증](#2-데이터-분석--kosis-데이터로-양극화-검증)
 3. [머신러닝 (분류) — 채팅 욕설 분류기](#3-머신러닝-분류--채팅-욕설-분류기)
-4. [머신러닝 (회귀) — 광고 노출 경과 시간 예측](#4-머신러닝-회귀--광고-노출-경과-시간-예측)
-5. [머신러닝 (추천) — 커뮤니티 추천 시스템](#5-머신러닝-추천--커뮤니티-추천-시스템)
+4. [머신러닝 (회귀) — 광고 노출 시간 예측](#4-머신러닝-회귀--광고-노출-시간-예측)
+5. [머신러닝 (추천) — 커뮤니티 추천](#5-머신러닝-추천--커뮤니티-추천)
 6. [LLM (RAG) — 화상회의 요약 챗봇](#6-llm-rag--화상회의-요약-챗봇)
-7. [LLM (n8n) — 주간 개인화 리포트 자동 발송](#7-llm-n8n--주간-개인화-리포트-자동-발송)
+7. [LLM (n8n) — 주간 개인화 메일 자동 발송](#7-llm-n8n--주간-개인화-메일-자동-발송)
 
 ---
 
 ## 1. 기획 배경 & 의도
 
-### 한국 수출의 두 겹 양극화
+### 한국 수출 구조의 두 겹 양극화(두 극단으로 쏠리는 현상)
 
-한국 경제는 GDP의 약 **40%를 수출에 의존**하지만, 그 구조 안에는 두 겹의 양극화가 존재한다.
+한국 경제는 GDP의 약 **40%를 수출에 의존**한다. 그런데 그 수출 구조 안에는 두 겹의 양극화가 존재한다.
 
 #### ① 기업 규모의 양극화
 
@@ -30,21 +30,21 @@
 | 중소기업 | 96.1% (93,912개사) | **16.6%** |
 | 대기업 | 1.06% | **64.5%** |
 
-- 1사당 평균 교역액 격차: **약 351배**
+- 1사평균(회사 하나당 평균) 교역액 격차: **약 351배**
 - 중소기업의 **60.2%가 매출 대비 수출 비중 1–24% 구간**에 9년째 정체
 
 #### ② 시장 분포의 편중
 
 - 상위 10개국 = 전체의 **71.1%**
-- 중국·미국 두 나라 = **36.2%** (외생 충격에 취약)
+- 중국·미국 두 나라 = **36.2%** (외생 충격(외부 변수로 인한 갑작스러운 타격)에 취약)
 - 그런데 실제 수출국은 **245개**, 연 1억 달러 이상 시장만 **112개**
 - 노르웨이(+84.3%), 스위스(+81.6%), 대만(+45.4%), 홍콩(+43.4%) 등 **신흥 시장 102개의 기회 공간은 사실상 비어 있음**
 
 ### 본질 문제
 
-> **"가장 많은 수의 중소기업(93,912개)이, 가장 많은 수의 신흥 시장(102개)에 도달하지 못하는 다대다 미스매치"**
+> **"가장 많은 수의 중소기업(93,912개)이, 가장 많은 수의 신흥 시장(102개)에 도달하지 못하는 다대다 미스매치(many-to-many mismatch — 양쪽에 많은데 서로 못 만나는 어긋남)"**
 
-이는 생산 역량의 문제가 아니라, **바이어를 만날 채널·시장 정보·신뢰 검증이라는 매개 인프라의 부재**다. KOTRA·해외전시회·무역사절단 같은 기존 채널은 1회성·고비용 모델이라 다대다 매칭을 감당할 수 없다.
+이는 생산 역량의 문제가 아니라, **바이어를 만날 채널·시장 정보·신뢰 검증이라는 매개 인프라(중간에서 연결해주는 다리 역할의 기반)의 부재**다. KOTRA·해외전시회·무역사절단 같은 기존 채널은 1회성·고비용 모델이라 다대다 매칭을 감당할 수 없다.
 
 ### 플랫폼 설계 — 3-Layer 구조
 
@@ -57,14 +57,14 @@
 ### 성공 척도
 
 단순 가입자 수가 아니라,
-- 중소기업의 수출강도가 **1–24% → 25–49% 구간**으로 우상향한 비율
+- 중소기업의 수출강도(매출에서 수출이 차지하는 비중)가 **1–24% → 25–49% 구간**으로 우상향한 비율
 - 도달 시장이 **102개 신흥국**으로 확장된 정도
 
 ---
 
-## 2. 데이터 분석 — KOSIS 4종 데이터 통합 분석
+## 2. 데이터 분석 — KOSIS 데이터로 양극화 검증
 
-> **목표**: 기획 배경의 두 양극화(기업 규모·시장 분포)를 **정량 근거로 검증**하고, 플랫폼이 1차로 묶어야 할 셀과 영입 풀을 식별
+> **목표**: 기획 배경의 두 양극화(기업 규모·시장 분포)를 **정량 근거(숫자로 보여줄 수 있는 증거)로 검증**하고, 플랫폼이 1차로 묶어야 할 셀과 영입 풀(데려와야 할 후보 그룹)을 식별
 
 ### 분석 축
 
@@ -78,7 +78,7 @@
 
 ### 검증 1. 시장 편중 — 누적 수출 상위 10개국
 
-상위 10개국에 누적 수출이 집중되어 있음을 시각화. **기획 배경의 "상위 10개국 71.1%, 중·미 36.2%" 주장에 대한 정량 근거**.
+상위 10개국에 누적 수출이 집중되어 있음을 시각화. **기획 배경의 "상위 10개국 71.1%, 중·미 36.2%" 주장에 대한 정량 근거(숫자로 보여주는 증거)**.
 
 ![누적 수출 상위 10개국](./AI_발표_images/kosis_04.png)
 
@@ -86,7 +86,7 @@
 
 ---
 
-### 검증 2. 기업 규모 양극화 — 1사평균 교역액 격차
+### 검증 2. 기업 규모 양극화 — 1사평균(회사 하나당 평균) 교역액 격차
 
 ```python
 size_2023_df = size_long_df[
@@ -99,13 +99,7 @@ size_2023_df = size_long_df[
 
 ![기업규모 × 수출강도 1사평균 교역액](./AI_발표_images/kosis_05.png)
 
-→ 1사평균 최상위는 **대기업 50–74% 구간(약 18.3억 천달러)**, 최하위는 **중소기업 1–24% 구간(약 307 천달러)**. 모수는 중소기업 1–24%(56,578개)가 압도적이며 **1사평균 격차는 약 5,964배**. **플랫폼이 묶어줘야 할 가치가 가장 큰 셀.**
-
-**격차의 추세 — 수출강도 75% 이상 셀의 1사평균 추이 (2015–2023)**
-
-![수출강도 75% 이상 1사평균 추이](./AI_발표_images/kosis_08.png)
-
-→ 같은 "수출 본업 구간"에 있어도 중소기업과 대기업·중견기업의 1사평균 격차가 **시간이 지나도 좁혀지지 않음**. 시장의 자발적 해소가 일어나지 않는다는 증거 → **매개 인프라가 필요한 이유**.
+→ 1사평균 최상위는 **대기업 50–74% 구간(약 18.3억 천달러)**, 최하위는 **중소기업 1–24% 구간(약 307 천달러)**. 모수(전체 후보 수)는 중소기업 1–24%(56,578개)가 압도적이며 **1사평균 격차는 약 5,964배**. **플랫폼이 묶어줘야 할 가치가 가장 큰 셀.**
 
 ---
 
@@ -124,7 +118,7 @@ plt.axvline(industry_hue_df["활동"].median(), color="gray", linestyle="--")
 
 ![산업별 활동 × 신생률 산점도](./AI_발표_images/kosis_07.png)
 
-→ 우상단(median 활동 × median 신생률 동시 통과) 산업이 **1차 영입 풀로 가장 두꺼움**. 활동 기업수가 많아 영입 모수가 크고, 신생률이 높아 신규 가입자 유입 가능성도 동시에 큼.
+→ 우상단(median(중앙값) 활동 × median 신생률 동시 통과) 산업이 **1차 영입 풀로 가장 두꺼움**. 활동 기업수가 많아 영입 모수가 크고, 신생률이 높아 신규 가입자 유입 가능성도 동시에 큼.
 
 ---
 
@@ -139,19 +133,19 @@ plt.axvline(industry_hue_df["활동"].median(), color="gray", linestyle="--")
 ## 3. 머신러닝 (분류) — 채팅 욕설 분류기
 
 > **목표**: 커뮤니티/채팅 본문의 욕설 여부를 실시간 분류하여 모달/순화 정책에 연결
-> **모델**: `CountVectorizer` + `MultinomialNB` (이진 분류)
+> **모델**: `CountVectorizer` + `MultinomialNB`(다항 나이브 베이즈 — 단어 빈도 기반 확률 분류기) (이진 분류(둘 중 하나로 가르기))
 > **데이터**: PostgreSQL `tbl_ml_profanity_dataset` (77,162행)
 
-**Target 분포 (언더샘플링 전)** — abusive 50,825 / clean 26,337
+**Target 분포 (언더샘플링(많은 쪽 데이터를 줄여 균형 맞추기) 전)** — abusive 50,825 / clean 26,337
 
 ![Target 분포](./AI_발표_images/classifier_01.png)
 
-### 과적합 억제 전략
+### 과적합(학습 데이터만 외워서 새 데이터에선 못 맞히는 현상) 억제 전략
 
-1. **Kiwi 형태소 + 조사/어미 제거**로 어휘 폭발 차단
-2. **StratifiedKFold(5)** — fold 별 클래스 비율 유지
-3. **2-stage 튜닝**: RandomizedSearchCV (넓게) → GridSearchCV (좁게)
-4. **3-seed 분산 체크** — 점수가 random_state 운빨인지 검증
+1. **Kiwi 형태소 분석기(한국어를 의미 단위로 쪼개주는 도구) + 조사/어미 제거**로 어휘 폭발 차단
+2. **StratifiedKFold(5)**(클래스 비율을 유지한 채 5조각으로 나누는 교차검증) — fold 별 클래스 비율 유지
+3. **2-stage 튜닝**: RandomizedSearchCV(넓게 무작위 탐색) → GridSearchCV(좁은 구간을 격자로 정밀 탐색)
+4. **3-seed 분산 체크** — 점수가 random_state(난수 시드)의 운빨인지 검증
 
 ### 핵심 코드 1 — 한국어 전처리 (Kiwi 조사 제거)
 
@@ -171,7 +165,7 @@ def remove_josa(sentence):
 
 **예시**: `"개소리야 니가 빨갱이를 옹호하고..."` → `"개소리 이다 니 빨갱이 옹호 하..."`
 
-### 핵심 코드 2 — 2-stage 튜닝 + 과적합 기준 모델 선택
+### 핵심 코드 2 — 2-stage 튜닝(2단계 하이퍼파라미터 탐색)
 
 ```python
 random_cv = RandomizedSearchCV(
@@ -186,7 +180,7 @@ grid_cv = GridSearchCV(m_nb_pipe, param_grid=grid_params,
 grid_cv.fit(X_train.values, y_train)
 ```
 
-### 핵심 코드 3 — Gap 기준 최종 모델 선택
+### 핵심 코드 3 — Gap(학습 점수 - 테스트 점수의 차이) 기준 최종 모델 선택
 
 ```python
 MAX_ALLOWED_GAP = 0.10  # train-test gap이 0.10 이내인 후보만 채택
@@ -206,9 +200,9 @@ final_model_row = eligible_models.sort_values(
 | regularized_min_df2 | 0.894 | **0.805** | **0.089** ✅ | **0.807** |
 | regularized_min_df3 | 0.867 | 0.803 | 0.063 ✅ | 0.805 |
 
-→ **min_df=2 (정규화)** 채택. 과적합 억제하면서 abusive F1 유지.
+→ **min_df=2 (정규화(과적합 방지를 위해 모델을 일부러 단순화))** 채택. 과적합 억제하면서 abusive F1 유지.
 
-### 3-seed Robustness 결과
+### 3-seed Robustness(강건성 — 결과가 시드에 흔들리지 않는 정도) 결과
 
 | 지표 | 평균 ± std | 판정 |
 |---|---|---|
@@ -220,7 +214,7 @@ final_model_row = eligible_models.sort_values(
 
 → **std < 0.005** 모두 통과. 점수가 random_state에 의존하지 않음.
 
-### 운영 threshold 정책 (모델 ≠ 의사결정)
+### 운영 threshold(임계값) 정책 (모델 ≠ 의사결정)
 
 ```python
 MODAL_THRESHOLD = 0.50    # 이 이상이면 모달로 경고
@@ -234,11 +228,11 @@ def moderation_action(p_abusive):
     return "allow"
 ```
 
-### 테스트셋 평가 — Confusion Matrix
+### 테스트셋 평가 — Confusion Matrix(혼동 행렬 — 예측 결과와 실제 라벨을 표로 정리한 것)
 
 ![욕설 분류기 Confusion Matrix](./AI_발표_images/classifier_02.png)
 
-- abusive 정밀도 0.7997 / 재현율 0.8140 / F1 0.8068
+- abusive 정밀도(맞다고 한 것 중 진짜 맞은 비율) 0.7997 / 재현율(진짜 맞은 것 중 잡아낸 비율) 0.8140 / F1 0.8068
 - clean 정밀도 0.8106 / 재현율 0.7961 / F1 0.8033
 
 ### 예측 데모
@@ -253,13 +247,13 @@ def moderation_action(p_abusive):
 
 ---
 
-## 4. 머신러닝 (회귀) — 광고 노출 경과 시간 예측
+## 4. 머신러닝 (회귀) — 광고 노출 시간 예측
 
 > **목표**: `payment_amount` (광고 결제 금액)으로 `elapsed_minutes` (노출 경과 시간) 예측
 > **목적**: 광고주가 결제 시점에 노출 기간을 알 수 있도록
-> **데이터**: 50,500행 / 1개 feature (정밀도 우선)
+> **데이터**: 50,500행 / 1개 feature(특성 변수, 입력 컬럼) (정밀도 우선)
 
-**EDA — payment_amount vs elapsed_minutes 산점도 & 타겟 분포**
+**EDA(탐색적 데이터 분석 — 본격 모델링 전에 데이터를 들여다보는 단계) — payment_amount vs elapsed_minutes 산점도 & 타겟 분포**
 
 ![광고 결제 vs 노출 시간 EDA](./AI_발표_images/regression_01.png)
 
@@ -269,16 +263,16 @@ def moderation_action(p_abusive):
 
 | Priority | 포인트 |
 |---|---|
-| P1 | split **먼저** → 전처리는 Pipeline 안에서 train에만 fit (data leakage 차단) |
-| P1 | 타겟 기반 IQR 필터링 제거 (production-valid 평가) |
-| P1 | GridSearch scoring을 **RMSLE 기반**으로 통일 (objective 일치) |
-| P2 | `TransformedTargetRegressor`로 log1p 변환 **일원화** |
+| P1 | split **먼저** → 전처리는 Pipeline 안에서 train에만 fit (data leakage(데이터 누수 — 테스트 정보가 학습에 새는 것) 차단) |
+| P1 | 타겟 기반 IQR(사분위 범위) 필터링 제거 (production-valid(실서비스에서도 유효한) 평가) |
+| P1 | GridSearch scoring을 **RMSLE(로그 스케일에서 잰 평균 제곱근 오차 — 큰 값과 작은 값을 비슷한 비중으로 평가) 기반**으로 통일 (objective(학습 목표) 일치) |
+| P2 | `TransformedTargetRegressor`(타겟 값을 변환해서 학습시키는 래퍼)로 log1p(log(1+x) — 0 근처에서 안전한 로그 변환) 변환 **일원화** |
 
-### 핵심 코드 1 — Pipeline 일원화 (전처리 + 타겟 변환)
+### 핵심 코드 1 — Pipeline(여러 처리 단계를 한 줄로 묶은 흐름) 일원화 (전처리 + 타겟 변환)
 
 ```python
 def make_pipeline(model, scale=False):
-    """median imputer + (선택적) scaler + 모델 + log1p 타겟 변환"""
+    """median imputer(중앙값으로 결측 채우기) + (선택적) scaler + 모델 + log1p 타겟 변환"""
     steps = [('impute', SimpleImputer(strategy='median'))]
     if scale:
         steps.append(('scale', StandardScaler()))
@@ -290,7 +284,7 @@ def make_pipeline(model, scale=False):
     )
 ```
 
-### 핵심 코드 2 — 6개 모델 베이스라인 CV (RMSLE 기준)
+### 핵심 코드 2 — 6개 모델 베이스라인(기준선) CV(교차검증) (RMSLE 기준)
 
 ```python
 candidates = {
@@ -319,7 +313,7 @@ for name, est in candidates.items():
 | DecisionTree | 0.1537 |
 | LinearRegression | 0.6106 |
 
-### 핵심 코드 3 — RandomForest GridSearch + 최종 평가
+### 핵심 코드 3 — RandomForest GridSearch(격자 탐색) + 최종 평가
 
 ```python
 param_grid = {
@@ -336,32 +330,32 @@ grid_rf = GridSearchCV(
 grid_rf.fit(X_train, y_train)
 ```
 
-### 최종 성능 (Locked Test Set, 1회 평가)
+### 최종 성능 (Locked Test Set(잠가둔 테스트 셋 — 단 1회만 평가에 사용), 1회 평가)
 
 | Metric | Value |
 |---|---|
-| **R²** | **0.9465** |
-| RMSE | 23,299.89 분 |
+| **R²**(결정계수 — 모델이 분산을 얼마나 설명하는지, 1에 가까울수록 좋음) | **0.9465** |
+| RMSE(평균 제곱근 오차) | 23,299.89 분 |
 | RMSLE | 0.1305 |
-| MAE | 12,995.75 분 |
+| MAE(평균 절대 오차) | 12,995.75 분 |
 
 → R² ≈ 0.95로 단일 feature 회귀에서도 강한 예측력 확보.
 
-**잔차 진단 — Actual vs Prediction / Residual vs payment_amount / Residual 분포**
+**잔차(residual — 실제 값과 예측 값의 차이) 진단 — Actual vs Prediction / Residual vs payment_amount / Residual 분포**
 
 ![잔차 진단](./AI_발표_images/regression_02.png)
 
-- 좌: 정렬된 예측선이 실제 분포를 잘 따라감 (꼬리 구간만 외삽 한계)
+- 좌: 정렬된 예측선이 실제 분포를 잘 따라감 (꼬리 구간만 외삽(extrapolation — 학습 범위 밖 예측) 한계)
 - 중: 잔차가 0 주변에 대칭적으로 분포 (편향 없음)
 - 우: 잔차 분포가 0을 중심으로 좁고 뾰족 → 대부분의 예측이 실제와 근접
 
 ---
 
-## 5. 머신러닝 (추천) — 커뮤니티 추천 시스템
+## 5. 머신러닝 (추천) — 커뮤니티 추천
 
-> **목표**: 사용자가 어떤 커뮤니티에 가입하면, **제목·태그·설명** 기반으로 비슷한 커뮤니티 Top-N 추천
-> **방법**: CountVectorizer / TfidfVectorizer + Cosine Similarity
-> **데이터**: `tbl_community_dataset` (시드 119건 + 템플릿 증강 → 총 320건, 41개 카테고리)
+> **목표**: 사용자가 어떤 커뮤니티에 가입하면, **제목·태그·설명** 기반으로 비슷한 커뮤니티 Top-N(상위 N개) 추천
+> **방법**: CountVectorizer(단어 빈도 벡터화) / TfidfVectorizer + Cosine Similarity(코사인 유사도 — 두 벡터가 가리키는 방향이 얼마나 비슷한지)
+> **데이터**: `tbl_community_dataset` (시드(원본) 119건 + 템플릿 증강 → 총 320건, 41개 카테고리)
 
 ### 핵심 코드 1 — 문서 결합 + Kiwi 전처리
 
@@ -376,7 +370,7 @@ pre_df = (
 pre_df['contents_kiwi'] = pre_df['contents'].apply(remove_josa)
 ```
 
-### 핵심 코드 2 — TF-IDF + 코사인 유사도
+### 핵심 코드 2 — TF-IDF(Term Frequency-Inverse Document Frequency — 흔한 단어는 가중치 깎고 드문 단어는 강조) + 코사인 유사도
 
 ```python
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -417,15 +411,17 @@ def recommend_similar_communities(community_id, top_n=5, method='tfidf'):
 
 ### 활용 시나리오
 
-플랫폼에서 신규 사용자가 "수출 첫걸음 입문자방"에 가입 → TF-IDF Top-5로 결이 비슷한 커뮤니티(예: "FTA 활용 입문방", "수출 서류 작성 스터디" 등)를 즉시 추천 → **소셜 그래프 레이어의 콜드 스타트 해결**.
+플랫폼에서 신규 사용자가 "수출 첫걸음 입문자방"에 가입 → TF-IDF Top-5로 결이 비슷한 커뮤니티(예: "FTA 활용 입문방", "수출 서류 작성 스터디" 등)를 즉시 추천 → **소셜 그래프 레이어의 콜드 스타트(cold start — 신규 가입자에게 보여줄 추천 데이터가 없는 문제) 해결**.
 
 ---
 
 ## 6. LLM (RAG) — 화상회의 요약 챗봇
 
 > **목표**: 사용자가 참여한 화상회의 요약을 LLM이 읽고, "지난 회의에서 합의한 단가가 얼마였지?" 같은 자연어 질문에 정확히 답
-> **스택**: LangChain + FAISS + `jhgan/ko-sbert-nli` + Redis Semantic Cache + GPT
+> **스택**: LangChain + FAISS(Facebook AI Similarity Search — 벡터 유사도 검색 라이브러리) + `jhgan/ko-sbert-nli`(한국어 문장 임베딩 모델) + Redis Semantic Cache(의미 기반 캐시 — 의미가 비슷한 질문의 답을 재활용) + GPT
 > **권한 모델**: `member_id`가 caller/receiver인 회의 요약만 검색·캐시
+
+> RAG(Retrieval-Augmented Generation — 검색으로 가져온 자료를 LLM에 같이 넣어 답하게 하는 방식): LLM이 외운 지식이 아니라 회의 요약에서 찾은 자료만 보고 답하게 만드는 구조.
 
 ### 전체 흐름 (8단계)
 
@@ -449,9 +445,9 @@ def recommend_similar_communities(community_id, top_n=5, method='tfidf'):
 
 ---
 
-### Step 1 — 문서 로드 (DB → Document)
+### Step 1 — 문서 로드 (DB → Document(LangChain의 본문+metadata 단위))
 
-운영 흐름과 동일하게, **현재 `member_id`가 caller 또는 receiver인 회의의 요약만** DB에서 가져온다. 권한 없는 회의가 벡터 DB에 적재되는 것 자체를 막는 1차 방어선.
+운영 흐름과 동일하게, **현재 `member_id`가 caller 또는 receiver인 회의의 요약만** DB에서 가져온다. 권한 없는 회의가 벡터 DB(벡터로 변환된 문서를 저장하고 의미 검색할 수 있는 저장소)에 적재되는 것 자체를 막는 1차 방어선.
 
 ```python
 def load_video_summaries_for_member(member_id, video_session_id=None):
@@ -467,7 +463,7 @@ def load_video_summaries_for_member(member_id, video_session_id=None):
     return pd.read_sql(query, engine, params={"member_id": int(member_id), ...})
 ```
 
-조회한 row마다 `.txt` 파일로 저장하고 `TextLoader`로 다시 읽어 `Document` 객체로 변환. **summary는 본문**, 나머지 컬럼은 **metadata**(추적·필터링용)로 부착.
+조회한 row마다 `.txt` 파일로 저장하고 `TextLoader`로 다시 읽어 `Document` 객체로 변환. **summary는 본문**, 나머지 컬럼은 **metadata(꼬리표 — 추적·필터링용 부가 정보)** 로 부착.
 
 ```python
 for row in summary_df.itertuples(index=False):
@@ -490,17 +486,17 @@ for txt_file in expected_files:
 
 ---
 
-### Step 2 — 시맨틱 캐시 설정 (질문 단위)
+### Step 2 — 시맨틱 캐시(의미 기반 캐시 — 표현이 달라도 뜻이 같으면 같은 답으로 매칭) 설정
 
 **왜 LangChain 전역 `RedisSemanticCache`를 끄는가?**
-RAG 최종 프롬프트에는 긴 공통 Context가 들어가서 **다른 질문도 같은 답변으로 캐시 히트**할 위험이 있다. 그래서 LangChain 전역 LLM 캐시는 끄고, `member_id + video_session_id + question`을 임베딩한 **답변 캐시**를 RAG 앞단에 둔다.
+RAG 최종 프롬프트에는 긴 공통 Context(LLM에 함께 넣는 참고 자료)가 들어가서 **다른 질문도 같은 답변으로 캐시 히트(찾는 항목이 캐시에 있어 재활용되는 것)** 할 위험이 있다. 그래서 LangChain 전역 LLM 캐시는 끄고, `member_id + video_session_id + question`을 임베딩한 **답변 캐시**를 RAG 앞단에 둔다.
 
 ```python
 set_llm_cache(None)  # 전역 LLM 캐시 끔
 
 cache_embeddings = HuggingFaceEmbeddings(
     model_name="jhgan/ko-sbert-nli",
-    encode_kwargs={'normalize_embeddings': True}
+    encode_kwargs={'normalize_embeddings': True}  # 벡터 크기를 1로 정규화
 )
 
 REDIS_URL = "redis://localhost:6380"
@@ -508,7 +504,7 @@ ANSWER_CACHE_INDEX = "video_chat_rag_answer_cache"
 ANSWER_CACHE_SCORE_THRESHOLD = 0.1
 ```
 
-scope를 만들어 사용자/회의별로 캐시를 분리하고, 질문 앞에 scope를 prepend하여 임베딩.
+scope(범위 키 — 사용자/회의 단위로 캐시를 분리하는 식별자)를 만들어 사용자/회의별로 캐시를 분리하고, 질문 앞에 scope를 prepend(앞에 붙임)하여 임베딩.
 
 ```python
 def build_cache_scope(video_session_id=None, member_id=None):
@@ -536,9 +532,9 @@ def lookup_answer_cache(question, video_session_id=None, member_id=None):
 
 ---
 
-### Step 3 — 문서 분할 (Chunking)
+### Step 3 — 문서 분할 (Chunking — 긴 문서를 일정 크기로 잘게 나누는 작업)
 
-회의 1건 요약이 500자보다 짧으면 **회의 1건 = 청크 1개**가 정상. `chunk_overlap=50`으로 문장 경계에서 잘려도 앞뒤 문맥이 일부 유지되도록 함.
+회의 1건 요약이 500자보다 짧으면 **회의 1건 = 청크(chunk — 잘게 나뉜 한 조각) 1개**가 정상. `chunk_overlap=50`으로 문장 경계에서 잘려도 앞뒤 문맥이 일부 유지되도록 함.
 
 ```python
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -550,9 +546,9 @@ print(f"분할된 청크의 수: {len(split_documents)}")
 
 ---
 
-### Step 4 — 임베딩 (RAG 검색용)
+### Step 4 — 임베딩 (Embedding — 문장의 의미를 숫자 벡터로 바꾸는 작업)
 
-한국어 의미 유사도가 검증된 **`jhgan/ko-sbert-nli`** 모델을 로컬 CPU에서 실행. `normalize_embeddings=True`로 벡터 크기를 정규화해 유사도 비교를 안정화.
+한국어 의미 유사도가 검증된 **`jhgan/ko-sbert-nli`**(한국어 SBERT — 자연어 추론으로 학습된 문장 임베딩 모델) 모델을 로컬 CPU에서 실행. `normalize_embeddings=True`로 벡터 크기를 정규화해 유사도 비교를 안정화.
 
 ```python
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -564,13 +560,13 @@ embeddings = HuggingFaceEmbeddings(
 )
 ```
 
-> 답변 캐시(Step 2)와 **같은 임베딩 모델**을 쓰는 게 핵심. 캐시 매칭 기준과 RAG 검색 기준이 다르면 캐시 히트율이 망가짐.
+> 답변 캐시(Step 2)와 **같은 임베딩 모델**을 쓰는 게 핵심. 캐시 매칭 기준과 RAG 검색 기준이 다르면 캐시 히트율(전체 조회 중 캐시에서 찾은 비율)이 망가짐.
 
 ---
 
 ### Step 5 — 벡터 DB (FAISS)
 
-분할된 청크들을 임베딩해서 로컬 FAISS 인덱스에 적재. 운영에서는 회의 요약이 갱신될 때마다 이 단계를 재실행.
+분할된 청크들을 임베딩해서 로컬 FAISS 인덱스(검색 가능한 형태로 정리된 벡터 저장소)에 적재. 운영에서는 회의 요약이 갱신될 때마다 이 단계를 재실행.
 
 ```python
 from langchain_community.vectorstores import FAISS
@@ -580,7 +576,7 @@ vectorstore = FAISS.from_documents(documents=split_documents, embedding=embeddin
 
 ---
 
-### Step 6 — 검색기 (Retriever + Metadata Filter)
+### Step 6 — 검색기 (Retriever + Metadata Filter — 꼬리표로 검색 범위를 좁히는 거름망)
 
 `video_session_id`가 들어오면 **해당 회의 청크만** 검색하도록 metadata filter 적용. → 사용자가 특정 회의를 콕 집어 물어볼 때 다른 회의 내용이 섞이는 것을 차단.
 
@@ -600,9 +596,9 @@ def format_documents(documents):
 
 ---
 
-### Step 7 — 프롬프트 (Context 밖 정보 금지)
+### Step 7 — 프롬프트 (Context 밖 정보 금지 — 환각 차단)
 
-핵심은 **Context 안의 정보만** 사용하게 제한하고, 모르면 모른다고 답하게 만드는 것. 환각(hallucination)을 시스템 레벨에서 차단.
+핵심은 **Context(LLM에 같이 넣어준 참고 자료) 안의 정보만** 사용하게 제한하고, 모르면 모른다고 답하게 만드는 것. 환각(hallucination — LLM이 사실이 아닌 내용을 그럴듯하게 지어내는 현상)을 시스템 레벨에서 차단.
 
 ```python
 from langchain_core.prompts import PromptTemplate
@@ -622,9 +618,9 @@ prompt = PromptTemplate.from_template(
 
 ---
 
-### Step 8 — LLM + LCEL 체인 (비동기 호환)
+### Step 8 — LLM + LCEL(LangChain Expression Language — `|` 파이프 연산자로 체인을 조립하는 표기법) 체인 (비동기 호환)
 
-LCEL(LangChain Expression Language) 체인은 `invoke` / `ainvoke` **둘 다 지원**. 정의는 동일하고 호출 시점에서만 비동기 여부 결정 → FastAPI 엔드포인트에서 `await chain.ainvoke(...)` 그대로 재사용.
+LCEL 체인은 `invoke`(동기 호출) / `ainvoke`(async — 비동기 호출) **둘 다 지원**. 정의는 동일하고 호출 시점에서만 비동기 여부 결정 → FastAPI 엔드포인트에서 `await chain.ainvoke(...)` 그대로 재사용.
 
 ```python
 from langchain_openai import ChatOpenAI
@@ -679,10 +675,10 @@ async def ask_video_chat_rag(question, video_session_id=None, member_id=None):
 
 ---
 
-## 7. LLM (n8n) — 주간 개인화 리포트 자동 발송
+## 7. LLM (n8n) — 주간 개인화 메일 자동 발송
 
-> **목표**: 매주 월요일 09:00, 지난 7일간 활동한 회원에게 **개인 맞춤 큐레이션 메일** 자동 발송
-> **스택**: n8n + PostgreSQL + OpenAI + Gmail
+> **목표**: 매주 월요일 09:00, 지난 7일간 활동한 회원에게 **개인 맞춤 큐레이션(선별·편집) 메일** 자동 발송
+> **스택**: n8n(노코드 워크플로우 자동화 도구) + PostgreSQL + OpenAI + Gmail
 
 ### 워크플로우
 
@@ -695,9 +691,9 @@ Schedule Trigger (Mon 09:00)
 
 ### 핵심 포인트
 
-- **사용자별 5종 데이터를 1쿼리로 묶음** (좋아요 글 / Top 해시태그 / 추천 글 / 추천 팔로우 / 추천 커뮤니티) → DB round-trip 최소화
-- **운영 안정성**: `continueOnFail`로 일부 회원 실패해도 워크플로우 유지, `_skip` 마커로 실패 격리, Gmail rate limit 대응
-- **개인화 강제 프롬프트**: 입력 데이터에 없는 사실 금지, 닉네임 4회 이상 호명, 마크다운 금지로 평문 메일
+- **사용자별 5종 데이터를 1쿼리로 묶음** (좋아요 글 / Top 해시태그 / 추천 글 / 추천 팔로우 / 추천 커뮤니티) → DB round-trip(왕복 요청) 최소화
+- **운영 안정성**: `continueOnFail`(중간 노드가 실패해도 다음 단계로 진행하는 옵션)로 일부 회원 실패해도 워크플로우 유지, `_skip` 마커로 실패 격리, Gmail rate limit(시간당 발송 횟수 제한) 대응
+- **개인화 강제 프롬프트**: 입력 데이터에 없는 사실 금지(환각 차단), 닉네임 4회 이상 호명, 마크다운 금지로 평문 메일
 
 ---
 
@@ -705,11 +701,11 @@ Schedule Trigger (Mon 09:00)
 
 | 파트 | 핵심 모델/기술 | 핵심 지표 / 결과 |
 |---|---|---|
-| 데이터 분석 | pandas + seaborn (4종 데이터 통합) | 1사평균 격차 5,964배, 영입 풀 우상단 산업 식별 |
+| 데이터 분석 | pandas + seaborn (KOSIS 통합) | 1사평균 격차 5,964배, 영입 풀 우상단 산업 식별 |
 | ML 분류 | MultinomialNB + Kiwi + 2-stage 튜닝 | F1 0.807, gap 0.089, 3-seed std < 0.005 |
 | ML 회귀 | RandomForest + log1p 타겟 변환 | **R² 0.9465**, RMSLE 0.1305 |
 | ML 추천 | TF-IDF + Cosine Similarity | 320개 커뮤니티 콜드스타트 추천 |
 | LLM RAG | LangChain + FAISS + Redis Semantic Cache | 캐시 hit 시 **45배 가속**, scope 권한 분리 |
-| LLM n8n | n8n + GPT-5.4-nano + Gmail | 주간 자동 발송, 5종 데이터 1쿼리 통합 |
+| LLM n8n | n8n + GPT + Gmail | 주간 자동 발송, 5종 데이터 1쿼리 통합 |
 
 > **공통 설계 원칙**: 각 모델/파이프라인은 단순 정확도가 아니라 **플랫폼 운영 시점의 의사결정**(영입 카테고리, 모달 정책, 추천, 권한 분리, 발송 안정성)에 연결되도록 설계했다.
